@@ -1,14 +1,23 @@
 package com.unicornsonlsd.finamp
 
+import android.os.Bundle
 import androidx.annotation.NonNull
 import androidx.mediarouter.app.SystemOutputSwitcherDialogController
 import androidx.mediarouter.media.MediaRouter
 import com.ryanheise.audioservice.AudioServiceActivity
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.Log
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity: AudioServiceActivity() {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    Log.setLogLevel(0)
+    Log.i("MainActivity", "onCreate");
+  }
+
+
   private val CHANNEL = "com.unicornsonlsd.finamp/output_switcher"
 
   override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {

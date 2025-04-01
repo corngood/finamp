@@ -84,6 +84,7 @@ void main() async {
   bool hasFailed = false;
   try {
     await setupLogging();
+    _mainLog.info("Before Setup edge-to-edge overlay");
     await _setupEdgeToEdgeOverlayStyle();
     _mainLog.info("Setup edge-to-edge overlay");
     await setupHive();
@@ -136,7 +137,7 @@ void main() async {
 
 Future<void> _setupEdgeToEdgeOverlayStyle() async {
   if (Platform.isAndroid) {
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge).then((value) => _mainLog.info("HELLO setEnabledSystemUIMode RETURNED!"));
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
         systemNavigationBarColor: Colors.transparent));
     final binding = WidgetsFlutterBinding.ensureInitialized();
@@ -472,6 +473,7 @@ class _FinampState extends State<Finamp> with WindowListener {
   @override
   void initState() {
     super.initState();
+    _mainLog.info("initState");
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       WindowManager.instance.addListener(this);
       // windowManager.setPreventClose(true); //!!! destroying the window manager instance doesn't seem to work on Windows release builds, the app just freezes instead
@@ -488,6 +490,7 @@ class _FinampState extends State<Finamp> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
+    _mainLog.info("build");
     return ProviderScope(
       child: GestureDetector(
         onTap: () {
@@ -506,9 +509,11 @@ class _FinampState extends State<Finamp> with WindowListener {
         child: ValueListenableBuilder(
           valueListenable: LocaleHelper.localeListener,
           builder: (_, __, ___) {
+            _mainLog.info("build 2");
             return ValueListenableBuilder<Box<ThemeMode>>(
               valueListenable: ThemeModeHelper.themeModeListener,
               builder: (context, box, __) {
+                _mainLog.info("build 3");
                 var theme = switch (box.get("ThemeMode")) {
                   null ||
                   ThemeMode.system =>
@@ -653,6 +658,7 @@ class _FinampState extends State<Finamp> with WindowListener {
 
   @override
   void onWindowEvent(String eventName) {
+    _mainLog.info("onWindowEvent ${eventName}");
     if (eventName == "move" || eventName == "resize") return;
     windowManagerLogger.finer("[WindowManager] onWindowEvent: $eventName");
   }
