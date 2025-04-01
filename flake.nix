@@ -33,7 +33,7 @@
             ndkVersion = "23.1.7779620";
             cmakeVersions = [ "3.22.1" ];
           };
-          jdk = jdk21_headless;
+          jdk = jdk17_headless;
         in
         mkShell rec {
           JAVA_HOME = jdk.home;
