@@ -417,8 +417,8 @@ class QueueService {
 
       _queueServiceLogger.info("DJM: addToNextUp");
       await addToNextUp(items: items["next"]!);
-      // _queueServiceLogger.info("DJM: seekFuture");
-      // await seekFuture;
+      _queueServiceLogger.info("DJM: seekFuture");
+      await seekFuture;
       _queueServiceLogger.info("DJM: after seekFuture");
       _queueServiceLogger.info("Loaded saved queue.");
       if (loadedTracks == 0 && info.trackCount > 0) {
