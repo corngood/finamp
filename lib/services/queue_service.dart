@@ -146,9 +146,6 @@ class QueueService {
     // );
   }
 
-  Future initializePlayer() =>
-      _audioHandler.initializeAudioSource(_queueAudioSource, preload: true);
-
   void _queueFromConcatenatingAudioSource({
     bool logUpdate = true,
   }) {
@@ -403,7 +400,7 @@ class QueueService {
       await _replaceWholeQueue(
           itemList: items["previous"]! + items["current"]! + items["queue"]!,
           initialIndex: items["previous"]!.length,
-          beginPlaying: !_audioHandler.paused,
+          beginPlaying: false,
           source: info.source ??
               QueueItemSource.rawId(
                   type: QueueItemSourceType.unknown,
@@ -412,6 +409,11 @@ class QueueService {
                   id: "savedqueue"));
 
       _queueServiceLogger.info("DJM: after _replaceWholeQueue");
+      Future<void> seekFuture = Future.value();
+      if ((info.currentTrackSeek ?? 0) > 5000) {
+        seekFuture = _audioHandler
+            .seek(Duration(milliseconds: (info.currentTrackSeek ?? 0) - 1000));
+      }
 
       _queueServiceLogger.info("DJM: addToNextUp");
       await addToNextUp(items: items["next"]!);
@@ -511,9 +513,6 @@ class QueueService {
         }
       }
 
-      //await stopPlayback(); //TODO is this really needed?
-      // await _audioHandler.initializeAudioSource(_queueAudioSource);
-      await _audioHandler.stopPlayback();
       await _queueAudioSource.clear();
 
       List<AudioSource> audioSources = [];
@@ -557,8 +556,6 @@ class QueueService {
       if (beginPlaying) {
         unawaited(_audioHandler
             .play()); // don't await this, because it will not return until playback is finished
-      } else {
-        unawaited(_audioHandler.pause());
       }
 
       _audioHandler.nextInitialIndex = null;
