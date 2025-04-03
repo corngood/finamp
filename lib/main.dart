@@ -392,7 +392,7 @@ Future<void> _setupPlaybackServices() async {
   var queueService = QueueService();
   GetIt.instance.registerSingleton(queueService);
   _mainLog.info("DJM - before initializePlayer");
-  await GetIt.instance<QueueService>().initializePlayer();
+  // await GetIt.instance<QueueService>().initializePlayer();
   _mainLog.info("DJM - after initializePlayer");
   GetIt.instance.registerSingleton(PlaybackHistoryService());
   GetIt.instance.registerSingleton(AudioServiceHelper());

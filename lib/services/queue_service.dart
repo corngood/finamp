@@ -403,7 +403,7 @@ class QueueService {
       await _replaceWholeQueue(
           itemList: items["previous"]! + items["current"]! + items["queue"]!,
           initialIndex: items["previous"]!.length,
-          beginPlaying: false,
+          beginPlaying: !_audioHandler.paused,
           source: info.source ??
               QueueItemSource.rawId(
                   type: QueueItemSourceType.unknown,
