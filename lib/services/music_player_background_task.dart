@@ -258,11 +258,13 @@ class MusicPlayerBackgroundTask extends BaseAudioHandler {
     _queueAudioSource = source;
 
     try {
+      _audioServiceBackgroundTaskLogger.info("DJM: before setAudioSource");
       await _player.setAudioSource(
         _queueAudioSource,
         preload: preload,
         initialIndex: nextInitialIndex,
       );
+      _audioServiceBackgroundTaskLogger.info("DJM: after setAudioSource");
     } on PlayerException catch (e) {
       _audioServiceBackgroundTaskLogger
           .severe("Player error code ${e.code}: ${e.message}");
@@ -458,6 +460,7 @@ class MusicPlayerBackgroundTask extends BaseAudioHandler {
   @override
   Future<void> seek(Duration position) async {
     try {
+      _audioServiceBackgroundTaskLogger.info("DJM: seek $position");
       await _player.seek(position);
     } catch (e) {
       _audioServiceBackgroundTaskLogger.severe(e);
@@ -804,6 +807,7 @@ class MusicPlayerBackgroundTask extends BaseAudioHandler {
   /// just_audio player will be transformed into an audio_service state so that
   /// it can be broadcast to audio_service clients.
   PlaybackState _transformEvent(PlaybackEvent event) {
+    //_audioServiceBackgroundTaskLogger.info("_transformEvent ${event} ${_player.processingState}");
     jellyfin_models.BaseItemDto? currentItem;
     bool isFavorite = false;
 

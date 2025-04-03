@@ -386,13 +386,18 @@ Future<void> _setupPlaybackServices() async {
         }),
   );
 
+  _mainLog.info("DJM - after audio service init");
+
   GetIt.instance.registerSingleton<MusicPlayerBackgroundTask>(audioHandler);
   var queueService = QueueService();
   GetIt.instance.registerSingleton(queueService);
+  _mainLog.info("DJM - before initializePlayer");
   await GetIt.instance<QueueService>().initializePlayer();
+  _mainLog.info("DJM - after initializePlayer");
   GetIt.instance.registerSingleton(PlaybackHistoryService());
   GetIt.instance.registerSingleton(AudioServiceHelper());
 
+  _mainLog.info("DJM - begin restore queue");
   // Begin to restore queue
   unawaited(queueService
       .performInitialQueueLoad()

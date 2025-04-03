@@ -265,6 +265,7 @@ class QueueService {
   }
 
   Future<void> performInitialQueueLoad() async {
+    _queueServiceLogger.info("DJM: performInitialQueueLoad $_savedQueueState");
     if (_savedQueueState == SavedQueueState.preInit) {
       try {
         _savedQueueState = SavedQueueState.init;
@@ -317,6 +318,7 @@ class QueueService {
   }
 
   Future<void> loadSavedQueue(FinampStorableQueueInfo info) async {
+    _queueServiceLogger.info("DJM: loadSavedQueue");
     if (_savedQueueState == SavedQueueState.loading) {
       return Future.error("A saved queue is currently loading");
     }
@@ -327,8 +329,10 @@ class QueueService {
     try {
       _savedQueueState = SavedQueueState.loading;
       if (info.trackCount == 0) {
+        _queueServiceLogger.info("DJM: trackCount == 0");
         return;
       }
+      _queueServiceLogger.info("DJM: refreshQueueStream");
       refreshQueueStream();
 
       List<jellyfin_models.BaseItemId> allIds = info.previousTracks +
@@ -355,11 +359,13 @@ class QueueService {
         playlistIds = itemList.map((e) => e.id).toSet();
       }
 
+      _queueServiceLogger.info("DJM: missingIds");
       // Get list of unique ids that do not yet have an associated item.
       List<jellyfin_models.BaseItemId> missingIds =
           allIds.toSet().difference(playlistIds).toList();
 
       if (FinampSettingsHelper.finampSettings.isOffline) {
+        _queueServiceLogger.info("DJM: isOffline");
         for (var id in missingIds) {
           jellyfin_models.BaseItemDto? item =
               downloadsService.getTrackDownload(id: id)?.baseItem;
@@ -388,10 +394,12 @@ class QueueService {
       int droppedTracks = info.trackCount - loadedTracks;
 
       if (_savedQueueState != SavedQueueState.loading) {
+        _queueServiceLogger.info("DJM: interrupted");
         finalState = null;
         return Future.error("Loading of saved Queue was interrupted.");
       }
 
+      _queueServiceLogger.info("DJM: _replaceWholeQueue ${_audioHandler.paused}");
       await _replaceWholeQueue(
           itemList: items["previous"]! + items["current"]! + items["queue"]!,
           initialIndex: items["previous"]!.length,
@@ -403,14 +411,13 @@ class QueueService {
                       type: QueueItemSourceNameType.savedQueue),
                   id: "savedqueue"));
 
-      Future<void> seekFuture = Future.value();
-      if ((info.currentTrackSeek ?? 0) > 5000) {
-        seekFuture = _audioHandler
-            .seek(Duration(milliseconds: (info.currentTrackSeek ?? 0) - 1000));
-      }
+      _queueServiceLogger.info("DJM: after _replaceWholeQueue");
 
+      _queueServiceLogger.info("DJM: addToNextUp");
       await addToNextUp(items: items["next"]!);
-      await seekFuture;
+      // _queueServiceLogger.info("DJM: seekFuture");
+      // await seekFuture;
+      _queueServiceLogger.info("DJM: after seekFuture");
       _queueServiceLogger.info("Loaded saved queue.");
       if (loadedTracks == 0 && info.trackCount > 0) {
         finalState = SavedQueueState.failed;
